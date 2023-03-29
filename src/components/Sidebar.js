@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faHouse, faUser, faBurger, faList } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom'
 
 export const Sidebar = () => {
     return (
@@ -12,32 +13,32 @@ export const Sidebar = () => {
                     <ul className="mt-6">
                         <li className="relative px-6 py-3">
                             <span className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true" ></span>
-                            <a className="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800" href="index.html" >
+                            <Link to={'/'} className="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faHouse} />
                                 <span className="ml-4">Dashboard</span>
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                     <ul>
                         <li className="relative px-6 py-3">
-                            <a className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800" href="forms.html">
+                            <Link to={'/data-admin'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faUser} />
                                 <span className="ml-4">Data Admin</span>
-                            </a>
+                            </Link>
                         </li>
 
                         <li className="relative px-6 py-3">
-                            <a className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800" href="forms.html">
+                            <Link to={'/menu-bazar'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faBurger} />
                                 <span className="ml-4">Menu Bazar</span>
-                            </a>
+                            </Link>
                         </li>
 
                         <li className="relative px-6 py-3">
-                            <a className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800" href="forms.html">
+                            <Link to={'/data-pesanan'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faList} />
                                 <span className="ml-4">Data Pesanan</span>
-                            </a>
+                            </Link>
                         </li>
                         
                     </ul>
