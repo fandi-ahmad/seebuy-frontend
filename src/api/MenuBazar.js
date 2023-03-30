@@ -27,7 +27,7 @@ export const UpdateBazar = (id, data) => {
 }
 
 export const DeleteBazar = (id) => {
-    return axios.delete(`${apiUrl}/deletr/${id}`)
+    return axios.delete(`${apiUrl}/delete/${id}`)
     .then(response => response.data)
     .catch(error => {
         throw error;
