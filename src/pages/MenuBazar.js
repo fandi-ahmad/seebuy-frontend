@@ -8,8 +8,9 @@ import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert
 
 const MenuBazar = () => {
     const [bazarList, setBazarList] = useState([])
-    const [loadingText, setLoadingText] = useState('')
+    const [actionText, setActionText] = useState('')
 
+    const [id, setId] = useState('')
     const [name, setName] = useState('')
     const [price, setPrice] = useState('')
     const [image, setImage] = useState('')
@@ -21,7 +22,7 @@ const MenuBazar = () => {
             const result = await GetBazar();
             setBazarList(result.data);
         } catch (err) {
-            console.log(err);
+            AlertError('Ups! something wrong')
         }
     };
 
@@ -38,32 +39,62 @@ const MenuBazar = () => {
     };
       
     const resetData = () => {
+        setId('')
         setName('')
         setPrice('')
         setImage('')
         setDesc('')
     }
 
-    const createBazar = async () => {
+    const upsertBazar = async () => {
         try {
-            setLoadingText('Created bazar')
+            closeUpsert()
             openLoading()
             const parsePrice = parseInt(price)
-            await CreateBazar({
-                nama_menu: name,
-                harga: parsePrice,
-                gambar: image,
-                description: desc
-            })
+            
+            // create
+            if (id === '') {
+                await CreateBazar({
+                    nama_menu: name,
+                    harga: parsePrice,
+                    gambar: image,
+                    description: desc
+                })
+            // update
+            } else {
+                await UpdateBazar(id, {
+                    nama_menu: name,
+                    harga: parsePrice,
+                    gambar: image,
+                    description: desc
+                })
+            }
 
             closeLoading()
             getAllData()
-            AlertSuccess('Bazar has been created')
+            AlertSuccess(`Bazar has been ${actionText}`)
             resetData()
         } catch (error) {
             closeLoading()
             AlertError('Ups! something wrong')
         }
+        closeUpsert()
+    }
+
+    const createNew = () => {
+        resetData()
+        setActionText('created')
+        openUpsert()
+    }
+
+    const editBazar = (bazar) => {
+        setId(bazar.id)
+        setName(bazar.nama_menu)
+        setPrice(bazar.harga)
+        setImage(bazar.gambar)
+        setDesc(bazar.description)
+        setActionText('updated')
+        openUpsert()
     }
 
     // open loading modal
@@ -78,8 +109,20 @@ const MenuBazar = () => {
         modalToggle.checked = false
     }
 
+     // open create/update modal
+     const openUpsert = () => {
+        const modalToggle = document.querySelector('#upsert')
+        modalToggle.checked = true
+    }
+    
+    // close create/update modal
+    const closeUpsert = () => {
+        const modalToggle = document.querySelector('#upsert')
+        modalToggle.checked = false
+    }
+
     // click delete button from table
-    const deleteBazar = async (bazarId) => {
+    const deleteBazar = (bazarId) => {
         AlertConfirm({
             title: 'Delete?',
             confirmText: 'Yes, Delete It',
@@ -92,7 +135,7 @@ const MenuBazar = () => {
     // delete bazar if confirm in modal
     const confirmDeleteBazar = async (id) => {
         try {
-            setLoadingText('Deleted bazar')
+            setActionText('Deleted')
             openLoading()
             await DeleteBazar(id)
 
@@ -121,7 +164,7 @@ const MenuBazar = () => {
         <Adminpanel>
             <div className='mb-4 flex justify-between items-center'>
                 <h2 className="text-2xl font-semibold text-gray-700">Menu Bazar</h2>
-                <label htmlFor="my-modal-5" className='btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none focus:outline-none capitalize'>
+                <label onClick={createNew} className='btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none focus:outline-none capitalize'>
                     <span className='mr-2'>create</span>
                     <FontAwesomeIcon icon={faPlus} />
                 </label>
@@ -145,18 +188,18 @@ const MenuBazar = () => {
                             {bazarList.map((bazar, index) => {
                                 return (
                                     <tr key={bazar.id} className='text-gray-700'>
-                                         <td className='pl-4 py-3'>{index + 1}</td>
+                                        <td className='pl-4 py-3'>{index + 1}</td>
                                         <td className="px-4 py-3">
                                             <p className="font-semibold">{bazar.nama_menu}</p>
                                         </td>
                                         <td className="px-4 py-3 text-sm">{bazar.harga}</td>
                                         <td className="px-4 py-3 text-sm">{bazar.gambar}</td>
                                         <td className="px-4 py-3 text-sm">{bazar.description}</td>
-                                        <td className="px-4 py-3 text-xl">
-                                            <button className='text-blue-700 hover:text-blue-800 focus:outline-none mr-4'>
+                                        <td className="px-4 py-3">
+                                            <button onClick={() => editBazar(bazar)} htmlFor="upsert" className='btn btn-sm p-0 text-2xl border-0 bg-transparent hover:bg-transparent text-blue-700 hover:text-blue-800 focus:outline-none mr-4'>
                                                 <FontAwesomeIcon icon={faPenToSquare} />
                                             </button>
-                                            <button onClick={() => deleteBazar(bazar.id)} className='text-red-700 hover:text-red-800 focus:outline-none'>
+                                            <button onClick={() => deleteBazar(bazar.id)} className='btn btn-sm p-0 text-2xl border-0 bg-transparent hover:bg-transparent text-red-700 hover:text-red-800 focus:outline-none'>
                                                 <FontAwesomeIcon icon={faTrash} />
                                             </button>
                                         </td>
@@ -167,19 +210,19 @@ const MenuBazar = () => {
                     </table>
                 </div>
                 <div className="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t bg-gray-50 sm:grid-cols-9">
-                    <span className="flex items-center col-span-3">
+                    {/* <span className="flex items-center col-span-3">
                         Showing 21-30 of 100
                     </span>
-                    <span className="col-span-2"></span>
-                    <Pagination/>
+                    <span className="col-span-2"></span> */}
+                    {/* <Pagination/> */}
                 </div>
             </main>
 
-            {/* ===== create modal ===== */}
-            <input type="checkbox" id="my-modal-5" className="modal-toggle" />
+            {/* ===== upsert modal ===== */}
+            <input type="checkbox" id="upsert" className="modal-toggle" />
             <div className="modal">
                 <div className="modal-box w-11/12 max-w-5xl bg-white text-gray-700">
-                    <h3 className="font-bold text-lg capitalize mb-4">create new bazar menu</h3>
+                    <h3 className="font-bold text-2xl capitalize mb-4">{actionText} bazar menu</h3>
                     <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
                         <div>
                             <p>name</p>
@@ -199,8 +242,8 @@ const MenuBazar = () => {
                         <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full max-w-xs bg-gray-50'></textarea>
                     </div>
                     <div className="modal-action">
-                        <label htmlFor="my-modal-5" className="btn btn-error capitalize mr-2">close</label>
-                        <label onClick={createBazar} htmlFor="my-modal-5" className="btn btn-info capitalize">create</label>
+                        <label onClick={closeUpsert} className="btn btn-error capitalize mr-2">close</label>
+                        <label onClick={upsertBazar} className="btn btn-info capitalize">{actionText}</label>
                     </div>
                 </div>
             </div>
@@ -211,7 +254,7 @@ const MenuBazar = () => {
                 <label className="modal-box relative bg-white text-gray-700 flex justify-center">
                     <div className='text-center'>
                         <h1 className='text-3xl capitalize font-semibold w-full text-center mb-2'>please wait</h1>
-                        <p className='w-full text-center mb-8'>{loadingText}</p>
+                        <p className='w-full text-center mb-8 capitalize'>{actionText} bazar</p>
                         <div className='w-full flex justify-center'>
                             <div className='loader'></div>
                         </div>
