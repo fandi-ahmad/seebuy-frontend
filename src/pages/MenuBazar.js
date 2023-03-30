@@ -9,7 +9,7 @@ const MenuBazar = () => {
     const [bazarList, setBazarList] = useState([])
 
     const [name, setName] = useState('')
-    const [price, setPrice] = useState()
+    const [price, setPrice] = useState('')
     const [image, setImage] = useState('')
     const [desc, setDesc] = useState('')
 
@@ -24,26 +24,47 @@ const MenuBazar = () => {
     };
 
     const handleChange = (params) => {
-        const nameInput = params.target.name
-        const value = params.target.value
-
-        if (nameInput === 'name') {
-            setName(value)
-        } else if (nameInput === 'price') {
-            setPrice(parseInt(value))
-        } else if (nameInput === 'image') {
-            setImage(value)
-        } else if (nameInput === 'desc') {
-            setDesc(value)
-        }
-
-    }
+        const { name, value } = params.target;
+        const setters = {
+            name: setName,
+            price: setPrice,
+            image: setImage,
+            desc: setDesc,
+        };
+        const setter = setters[name];
+        setter(value);
+    };
+      
 
     const cek = () => {
         console.log('name:', name)
         console.log('price:', price)
         console.log('image:', image)
         console.log('desc:', desc)
+    }
+
+    const resetData = () => {
+        setName('')
+        setPrice('')
+        setImage('')
+        setDesc('')
+    }
+
+    const createBazar = async () => {
+        try {
+            const parsePrice = parseInt(price)
+            await CreateBazar({
+                nama_menu: name,
+                harga: parsePrice,
+                gambar: image,
+                description: desc
+            })
+            resetData()
+            getAllData()
+        } catch (error) {
+            console.log(error)
+        }
+
     }
     
     // run in first load
@@ -120,28 +141,29 @@ const MenuBazar = () => {
             <input type="checkbox" id="my-modal-5" className="modal-toggle" />
             <div className="modal">
                 <div className="modal-box w-11/12 max-w-5xl bg-white text-gray-700">
-                    <h3 className="font-bold text-lg capitalize">create new bazar menu</h3>
-                    <p className="py-4">You've been selected for a chance to get one year of subscription to use Wikipedia for free!</p>
-                    <div>
-                        <p>name</p>
-                        <input type="text" value={name} onChange={handleChange} name='name' placeholder="Type here" className="input input-info focus:outline-none w-full max-w-xs bg-gray-50" />
+                    <h3 className="font-bold text-lg capitalize mb-4">create new bazar menu</h3>
+                    <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
+                        <div>
+                            <p>name</p>
+                            <input type="text" value={name} onChange={handleChange} name='name' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                        </div>
+                        <div>
+                            <p>price</p>
+                            <input type="text" value={price} onChange={handleChange} name='price' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                        </div>
+                        <div>
+                            <p>image</p>
+                            <input type="text" value={image} onChange={handleChange} name='image' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                        </div>
                     </div>
-                    <div>
-                        <p>price</p>
-                        <input type="number" value={price} onChange={handleChange} name='price' placeholder="Type here" className="input input-info focus:outline-none w-full max-w-xs bg-gray-50" />
-                    </div>
-                    <div>
-                        <p>image</p>
-                        <input type="text" value={image} onChange={handleChange} name='image' placeholder="Type here" className="input input-info focus:outline-none w-full max-w-xs bg-gray-50" />
-                    </div>
-                    <div>
+                    <div className='mt-4'>
                         <p>description</p>
-                        <input type="text" value={desc} onChange={handleChange} name='desc' placeholder="Type here" className="input input-info focus:outline-none w-full max-w-xs bg-gray-50" />
+                        <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full max-w-xs bg-gray-50'></textarea>
                     </div>
                     <button className='btn' onClick={cek}>test</button>
                     <div className="modal-action">
                         <label htmlFor="my-modal-5" className="btn btn-error capitalize mr-2">close</label>
-                        <label htmlFor="my-modal-5" className="btn btn-info capitalize">create</label>
+                        <label onClick={createBazar} htmlFor="my-modal-5" className="btn btn-info capitalize">create</label>
                     </div>
                 </div>
             </div>
