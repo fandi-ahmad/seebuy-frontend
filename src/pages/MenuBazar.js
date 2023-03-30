@@ -35,14 +35,6 @@ const MenuBazar = () => {
         setter(value);
     };
       
-
-    const cek = () => {
-        console.log('name:', name)
-        console.log('price:', price)
-        console.log('image:', image)
-        console.log('desc:', desc)
-    }
-
     const resetData = () => {
         setName('')
         setPrice('')
@@ -52,6 +44,7 @@ const MenuBazar = () => {
 
     const createBazar = async () => {
         try {
+            openLoading()
             const parsePrice = parseInt(price)
             await CreateBazar({
                 nama_menu: name,
@@ -59,12 +52,25 @@ const MenuBazar = () => {
                 gambar: image,
                 description: desc
             })
+
+            closeLoading()
             resetData()
             getAllData()
         } catch (error) {
             console.log(error)
         }
+    }
 
+    // open loading modal
+    const openLoading = () => {
+        const modalToggle = document.querySelector('#modal-loading')
+        modalToggle.checked = true
+    }
+    
+    // close loading modal
+    const closeLoading = () => {
+        const modalToggle = document.querySelector('#modal-loading')
+        modalToggle.checked = false
     }
     
     // run in first load
@@ -167,6 +173,20 @@ const MenuBazar = () => {
                     </div>
                 </div>
             </div>
+
+            {/* ===== loading ===== */}
+            <input type="checkbox" id="modal-loading" className="modal-toggle" />
+            <label htmlFor="modal-loading" className="modal">
+                <label className="modal-box relative bg-white text-gray-700 flex justify-center">
+                    <div className='text-center'>
+                        <h1 className='text-3xl capitalize font-semibold w-full text-center'>please wait</h1>
+                        <p className='w-full text-center mb-8'>Created bazar</p>
+                        <div className='w-full flex justify-center'>
+                            <div className='loader'></div>
+                        </div>
+                    </div>
+                </label>
+            </label>
         </Adminpanel>
     )
 }
