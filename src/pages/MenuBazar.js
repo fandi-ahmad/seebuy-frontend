@@ -4,6 +4,7 @@ import { Adminpanel } from '../layouts/Adminpanel'
 import { GetBazar, CreateBazar, UpdateBazar, DeleteBazar } from '../api/MenuBazar'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { AlertSuccess } from '../components/SweetAlert'
 
 const MenuBazar = () => {
     const [bazarList, setBazarList] = useState([])
@@ -54,6 +55,7 @@ const MenuBazar = () => {
             })
 
             closeLoading()
+            AlertSuccess('Bazar has been created')
             resetData()
             getAllData()
         } catch (error) {
@@ -155,7 +157,7 @@ const MenuBazar = () => {
                         </div>
                         <div>
                             <p>price</p>
-                            <input type="text" value={price} onChange={handleChange} name='price' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                            <input type="number" value={price} onChange={handleChange} name='price' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
                         </div>
                         <div>
                             <p>image</p>
@@ -166,7 +168,6 @@ const MenuBazar = () => {
                         <p>description</p>
                         <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full max-w-xs bg-gray-50'></textarea>
                     </div>
-                    <button className='btn' onClick={cek}>test</button>
                     <div className="modal-action">
                         <label htmlFor="my-modal-5" className="btn btn-error capitalize mr-2">close</label>
                         <label onClick={createBazar} htmlFor="my-modal-5" className="btn btn-info capitalize">create</label>
