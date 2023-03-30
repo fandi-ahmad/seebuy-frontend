@@ -5,7 +5,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 
 import { Dashhboard } from "./pages/Dashhboard";
 import DataAdmin from "./pages/DataAdmin";
-import { MenuBazar } from "./pages/MenuBazar";
+import MenuBazar from "./pages/MenuBazar";
 import { DataPesanan } from "./pages/DataPesanan";
 
 function App() {

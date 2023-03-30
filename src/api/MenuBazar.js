@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const apiUrl = 'http://localhost:8000/cms/bazar';
+const apiUrl = 'http://localhost:8000/api/cms/bazar';
 
 export const GetBazar = () => {
-    return axios.get(`${apiUrl}`)
+    return axios.get(apiUrl,)
     .then(response => response.data)
     .catch(error => {
         throw error;
