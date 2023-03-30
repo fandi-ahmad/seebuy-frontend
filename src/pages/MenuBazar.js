@@ -4,10 +4,11 @@ import { Adminpanel } from '../layouts/Adminpanel'
 import { GetBazar, CreateBazar, UpdateBazar, DeleteBazar } from '../api/MenuBazar'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { AlertSuccess } from '../components/SweetAlert'
+import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert'
 
 const MenuBazar = () => {
     const [bazarList, setBazarList] = useState([])
+    const [loadingText, setLoadingText] = useState('')
 
     const [name, setName] = useState('')
     const [price, setPrice] = useState('')
@@ -45,6 +46,7 @@ const MenuBazar = () => {
 
     const createBazar = async () => {
         try {
+            setLoadingText('Created bazar')
             openLoading()
             const parsePrice = parseInt(price)
             await CreateBazar({
@@ -55,11 +57,12 @@ const MenuBazar = () => {
             })
 
             closeLoading()
+            getAllData()
             AlertSuccess('Bazar has been created')
             resetData()
-            getAllData()
         } catch (error) {
-            console.log(error)
+            closeLoading()
+            AlertError('Ups! something wrong')
         }
     }
 
@@ -73,6 +76,33 @@ const MenuBazar = () => {
     const closeLoading = () => {
         const modalToggle = document.querySelector('#modal-loading')
         modalToggle.checked = false
+    }
+
+    // click delete button from table
+    const deleteBazar = async (bazarId) => {
+        AlertConfirm({
+            title: 'Delete?',
+            confirmText: 'Yes, Delete It',
+            preConfirm: () => {
+                confirmDeleteBazar(bazarId)
+            }
+        })
+    }
+
+    // delete bazar if confirm in modal
+    const confirmDeleteBazar = async (id) => {
+        try {
+            setLoadingText('Deleted bazar')
+            openLoading()
+            await DeleteBazar(id)
+
+            closeLoading()
+            getAllData()
+            AlertSuccess('Bazar has been deleted')
+        } catch (error) {
+            closeLoading()
+            AlertError('Ups! something wrong')
+        }
     }
     
     // run in first load
@@ -126,7 +156,7 @@ const MenuBazar = () => {
                                             <button className='text-blue-700 hover:text-blue-800 focus:outline-none mr-4'>
                                                 <FontAwesomeIcon icon={faPenToSquare} />
                                             </button>
-                                            <button className='text-red-700 hover:text-red-800 focus:outline-none'>
+                                            <button onClick={() => deleteBazar(bazar.id)} className='text-red-700 hover:text-red-800 focus:outline-none'>
                                                 <FontAwesomeIcon icon={faTrash} />
                                             </button>
                                         </td>
@@ -180,8 +210,8 @@ const MenuBazar = () => {
             <label htmlFor="modal-loading" className="modal">
                 <label className="modal-box relative bg-white text-gray-700 flex justify-center">
                     <div className='text-center'>
-                        <h1 className='text-3xl capitalize font-semibold w-full text-center'>please wait</h1>
-                        <p className='w-full text-center mb-8'>Created bazar</p>
+                        <h1 className='text-3xl capitalize font-semibold w-full text-center mb-2'>please wait</h1>
+                        <p className='w-full text-center mb-8'>{loadingText}</p>
                         <div className='w-full flex justify-center'>
                             <div className='loader'></div>
                         </div>
