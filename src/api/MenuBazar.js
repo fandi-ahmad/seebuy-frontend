@@ -2,6 +2,12 @@ import axios from 'axios';
 
 const apiUrl = 'http://localhost:8000/api/cms/bazar';
 
+const config = {
+    headers: {
+        'content-type': 'multipart/form-data'
+    }
+};
+
 export const GetBazar = () => {
     return axios.get(apiUrl,)
     .then(response => response.data)
@@ -11,7 +17,7 @@ export const GetBazar = () => {
 }
 
 export const CreateBazar = (data) => {
-    return axios.post(`${apiUrl}/create`, data)
+    return axios.post(`${apiUrl}/create`, data, config)
     .then(response => response.data)
     .catch(error => {
         throw error;
@@ -19,7 +25,7 @@ export const CreateBazar = (data) => {
 }
 
 export const UpdateBazar = (id, data) => {
-    return axios.put(`${apiUrl}/update/${id}`, data)
+    return axios.put(`${apiUrl}/update/${id}`, data, config)
     .then(response => response.data)
     .catch(error => {
         throw error;

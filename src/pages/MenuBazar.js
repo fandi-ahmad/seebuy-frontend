@@ -13,8 +13,18 @@ const MenuBazar = () => {
     const [id, setId] = useState('')
     const [name, setName] = useState('')
     const [price, setPrice] = useState('')
-    const [image, setImage] = useState('')
     const [desc, setDesc] = useState('')
+    const [image, setImage] = useState('')
+    const [imageUrl, setImageUrl] = useState('');
+
+    const [editOpen, setEditOpen] = useState(false)
+
+    const [post, setPost] = useState({
+        name: '',
+        price: NaN,
+        image: null,
+        desc: ''
+    })
 
     // get all data bazar from API
     const getAllData = async () => {
@@ -26,48 +36,170 @@ const MenuBazar = () => {
         }
     };
 
-    const handleChange = (params) => {
-        const { name, value } = params.target;
-        const setters = {
-            name: setName,
-            price: setPrice,
-            image: setImage,
-            desc: setDesc,
-        };
-        const setter = setters[name];
-        setter(value);
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     const setters = {
+    //         name: setName,
+    //         price: setPrice,
+    //         image: setImage,
+    //         desc: setDesc,
+    //     };
+    //     const setter = setters[name];
+    //     setter(value);
+    //     setPost({...post, [e.target.name]: e.target.value})
+    // };
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+    
+        switch (name) {
+            case 'name':
+                setName(value);
+                break;
+            case 'price':
+                setPrice(value);
+                break;
+            case 'desc':
+                setDesc(value);
+                break;
+            default:
+                break;
+        }
     };
-      
+    
+    const handleChangeImage = (e) => {
+        const imageSelect = e.target.files[0]
+        setImage(imageSelect);
+        setImageUrl(URL.createObjectURL(imageSelect));
+        console.log(imageSelect)
+    };
+    
+
+    const uploadImage = () => {
+        // if (!saveImage) {
+        //     console.log('image masih kosong')
+        // } else {
+        //     let formImage = new FormData()
+        //     console.log(formImage)
+
+        //     formImage.append('photo', saveImage)
+
+        //     const parsePrice = parseInt(price)
+
+        //     console.log(formImage)
+        //     CreateBazar({
+        //         nama_menu: name,
+        //         harga: parsePrice,
+        //         gambar: saveImage,
+        //         description: desc
+        //     })
+        //     // .then((res) => res.json())
+        //     .then(data => {
+        //         console.log(data)
+        //         if (data.status === 'success') {
+        //             window.location.href = data.image
+        //         }
+        //     })
+        // }
+
+    }
+
+    const cek = (e) => {
+        console.log('id:', id)
+        console.log('name:', name)
+        console.log('price:', price)
+        console.log('desc:', desc)
+        console.log('image:', image)
+        console.log('imageUrl:', imageUrl)
+        console.log(document.getElementById('imageForm').value)
+    }
+
     const resetData = () => {
         setId('')
         setName('')
         setPrice('')
         setImage('')
+        setImageUrl('')
         setDesc('')
+        setEditOpen(false)
     }
+
+    // const upsertBazar = async () => {
+    //     try {
+    //         closeUpsert()
+    //         openLoading()
+    //         const parsePrice = parseInt(price)
+
+    //         // create
+    //         if (id === '') {
+    //             await CreateBazar({
+    //                 nama_menu: name,
+    //                 harga: parsePrice,
+    //                 gambar: image,
+    //                 description: desc
+    //             })
+    //         // update
+    //         } else {
+    //             setImage(null)
+    //             await UpdateBazar(id, {
+    //                 nama_menu: name,
+    //                 harga: parsePrice,
+    //                 gambar: image,
+    //                 description: desc
+    //             })
+    //         }
+
+    //         closeLoading()
+    //         getAllData()
+    //         AlertSuccess(`Bazar has been ${actionText}`)
+    //         resetData()
+    //     } catch (error) {
+    //         closeLoading()
+    //         AlertError('Ups! something wrong')
+    //         console.log(error)
+    //     }
+    //     closeUpsert()
+    // }
+
 
     const upsertBazar = async () => {
         try {
             closeUpsert()
             openLoading()
             const parsePrice = parseInt(price)
-            
+            // const formData = new FormData();
+            // formData.append('nama_menu', name);
+            // formData.append('harga', parsePrice);
+            // formData.append('gambar', image);
+            // formData.append('description', desc);
+        
+            // const config = {
+            //     headers: {
+            //         'content-type': 'multipart/form-data'
+            //     }
+            // };
+    
+            // const response = await axios.post('http://localhost:8000/api/cms/bazar/create/', formData, config);
+
             // create
             if (id === '') {
-                await CreateBazar({
+                const result = await CreateBazar({
                     nama_menu: name,
                     harga: parsePrice,
                     gambar: image,
                     description: desc
                 })
-            // update
+                console.log('result data: ',result);
             } else {
-                await UpdateBazar(id, {
+                // update
+                // setImage(null)
+                const result = await UpdateBazar(id, {
                     nama_menu: name,
                     harga: parsePrice,
                     gambar: image,
                     description: desc
                 })
+                console.log('result data: ',result);
             }
 
             closeLoading()
@@ -77,9 +209,11 @@ const MenuBazar = () => {
         } catch (error) {
             closeLoading()
             AlertError('Ups! something wrong')
+            console.log(error)
         }
         closeUpsert()
-    }
+    };
+
 
     const createNew = () => {
         resetData()
@@ -94,8 +228,25 @@ const MenuBazar = () => {
         setImage(bazar.gambar)
         setDesc(bazar.description)
         setActionText('updated')
+        
+        setEditOpen(true)
+
         openUpsert()
     }
+
+    useEffect(() => {
+        console.log(editOpen)
+        if (editOpen) {
+            if (id === '') {
+                console.log('id masih kosong')
+            } else {
+                console.log('id tidak kosong')
+                const takeImage = `http://localhost:8000/api/cms/gambar/${image}`
+
+                setImageUrl(takeImage)
+            }
+        }
+    }, [editOpen])
 
     // open loading modal
     const openLoading = () => {
@@ -119,6 +270,7 @@ const MenuBazar = () => {
     const closeUpsert = () => {
         const modalToggle = document.querySelector('#upsert')
         modalToggle.checked = false
+        resetData()
     }
 
     // click delete button from table
@@ -234,16 +386,19 @@ const MenuBazar = () => {
                         </div>
                         <div>
                             <p>image</p>
-                            <input type="text" value={image} onChange={handleChange} name='image' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                            <input type="file" onChange={handleChangeImage} name='image' id='imageForm' accept='image/*' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                            {imageUrl && <img src={imageUrl} alt="preview" />}
                         </div>
                     </div>
                     <div className='mt-4'>
                         <p>description</p>
                         <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full max-w-xs bg-gray-50'></textarea>
                     </div>
+                    <button onClick={cek} className='btn btn-sm'>cek</button>
                     <div className="modal-action">
                         <label onClick={closeUpsert} className="btn btn-error capitalize mr-2">close</label>
                         <label onClick={upsertBazar} className="btn btn-info capitalize">{actionText}</label>
+                        <label onClick={uploadImage} className="btn btn-info capitalize ml-2">cek image</label>
                     </div>
                 </div>
             </div>
