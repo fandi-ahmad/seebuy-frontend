@@ -2,6 +2,7 @@ import React from 'react'
 import { Pagination } from '../components/Pagination'
 import { Adminpanel } from '../layouts/Adminpanel'
 
+
 const DataAdmin = () => {
     return (
         <Adminpanel>
