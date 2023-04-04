@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react'
 import { Pagination } from '../components/Pagination'
 import { Adminpanel } from '../layouts/Adminpanel'
-import { GetBazar, CreateBazar, UpdateBazar, DeleteBazar } from '../api/MenuBazar'
+import { GetBazar, CreateBazar, UpdateBazar, DeleteBazar, ApiBazar } from '../api/MenuBazar'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert'
@@ -71,38 +71,10 @@ const MenuBazar = () => {
         const imageSelect = e.target.files[0]
         setImage(imageSelect);
         setImageUrl(URL.createObjectURL(imageSelect));
-        console.log(imageSelect)
+        console.log('image select:', imageSelect)
+        console.log('image:',image)
     };
     
-
-    const uploadImage = () => {
-        // if (!saveImage) {
-        //     console.log('image masih kosong')
-        // } else {
-        //     let formImage = new FormData()
-        //     console.log(formImage)
-
-        //     formImage.append('photo', saveImage)
-
-        //     const parsePrice = parseInt(price)
-
-        //     console.log(formImage)
-        //     CreateBazar({
-        //         nama_menu: name,
-        //         harga: parsePrice,
-        //         gambar: saveImage,
-        //         description: desc
-        //     })
-        //     // .then((res) => res.json())
-        //     .then(data => {
-        //         console.log(data)
-        //         if (data.status === 'success') {
-        //             window.location.href = data.image
-        //         }
-        //     })
-        // }
-
-    }
 
     const cek = (e) => {
         console.log('id:', id)
@@ -124,42 +96,6 @@ const MenuBazar = () => {
         setEditOpen(false)
     }
 
-    // const upsertBazar = async () => {
-    //     try {
-    //         closeUpsert()
-    //         openLoading()
-    //         const parsePrice = parseInt(price)
-
-    //         // create
-    //         if (id === '') {
-    //             await CreateBazar({
-    //                 nama_menu: name,
-    //                 harga: parsePrice,
-    //                 gambar: image,
-    //                 description: desc
-    //             })
-    //         // update
-    //         } else {
-    //             setImage(null)
-    //             await UpdateBazar(id, {
-    //                 nama_menu: name,
-    //                 harga: parsePrice,
-    //                 gambar: image,
-    //                 description: desc
-    //             })
-    //         }
-
-    //         closeLoading()
-    //         getAllData()
-    //         AlertSuccess(`Bazar has been ${actionText}`)
-    //         resetData()
-    //     } catch (error) {
-    //         closeLoading()
-    //         AlertError('Ups! something wrong')
-    //         console.log(error)
-    //     }
-    //     closeUpsert()
-    // }
 
 
     const upsertBazar = async () => {
@@ -167,19 +103,6 @@ const MenuBazar = () => {
             closeUpsert()
             openLoading()
             const parsePrice = parseInt(price)
-            // const formData = new FormData();
-            // formData.append('nama_menu', name);
-            // formData.append('harga', parsePrice);
-            // formData.append('gambar', image);
-            // formData.append('description', desc);
-        
-            // const config = {
-            //     headers: {
-            //         'content-type': 'multipart/form-data'
-            //     }
-            // };
-    
-            // const response = await axios.post('http://localhost:8000/api/cms/bazar/create/', formData, config);
 
             // create
             if (id === '') {
@@ -196,7 +119,7 @@ const MenuBazar = () => {
                 const result = await UpdateBazar(id, {
                     nama_menu: name,
                     harga: parsePrice,
-                    gambar: image,
+                    // gambar: image,
                     description: desc
                 })
                 console.log('result data: ',result);
@@ -299,6 +222,18 @@ const MenuBazar = () => {
             AlertError('Ups! something wrong')
         }
     }
+
+    function formatPrice(harga) {
+        return `Rp. ${harga.toLocaleString("id-ID")}`;
+    }
+
+    const limitDesc = (params) => {
+        if (params.length > 30) {
+            return params.slice(0, 30) + " ...";
+        } else {
+            return params;
+        }
+    }
     
     // run in first load
     useEffect(() => {
@@ -344,9 +279,11 @@ const MenuBazar = () => {
                                         <td className="px-4 py-3">
                                             <p className="font-semibold">{bazar.nama_menu}</p>
                                         </td>
-                                        <td className="px-4 py-3 text-sm">{bazar.harga}</td>
-                                        <td className="px-4 py-3 text-sm">{bazar.gambar}</td>
-                                        <td className="px-4 py-3 text-sm">{bazar.description}</td>
+                                        <td className="px-4 py-3 text-sm">{formatPrice(bazar.harga)}</td>
+                                        <td className="px-4 py-3 text-sm">
+                                            <img alt={bazar.gambar} src={`${ApiBazar}/gambar/${bazar.gambar}`} className='h-20' />
+                                        </td>
+                                        <td className="px-4 py-3 text-sm">{limitDesc(bazar.description)}</td>
                                         <td className="px-4 py-3">
                                             <button onClick={() => editBazar(bazar)} htmlFor="upsert" className='btn btn-sm p-0 text-2xl border-0 bg-transparent hover:bg-transparent text-blue-700 hover:text-blue-800 focus:outline-none mr-4'>
                                                 <FontAwesomeIcon icon={faPenToSquare} />
@@ -375,7 +312,7 @@ const MenuBazar = () => {
             <div className="modal">
                 <div className="modal-box w-11/12 max-w-5xl bg-white text-gray-700">
                     <h3 className="font-bold text-2xl capitalize mb-4">{actionText} bazar menu</h3>
-                    <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
+                    <div className='grid gap-4 md:grid-cols-2'>
                         <div>
                             <p>name</p>
                             <input type="text" value={name} onChange={handleChange} name='name' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
@@ -387,18 +324,17 @@ const MenuBazar = () => {
                         <div>
                             <p>image</p>
                             <input type="file" onChange={handleChangeImage} name='image' id='imageForm' accept='image/*' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
-                            {imageUrl && <img src={imageUrl} alt="preview" />}
+                            {imageUrl && <img src={imageUrl} alt="preview" className='h-40 rounded-md mt-4' />}
+                        </div>
+                        <div>
+                            <p>description</p>
+                            <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full min-h-full max-w-xs bg-gray-50'></textarea>
                         </div>
                     </div>
-                    <div className='mt-4'>
-                        <p>description</p>
-                        <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full max-w-xs bg-gray-50'></textarea>
-                    </div>
-                    <button onClick={cek} className='btn btn-sm'>cek</button>
-                    <div className="modal-action">
+                    {/* <button onClick={cek} className='btn btn-sm'>cek</button> */}
+                    <div className="modal-action pt-4">
                         <label onClick={closeUpsert} className="btn btn-error capitalize mr-2">close</label>
                         <label onClick={upsertBazar} className="btn btn-info capitalize">{actionText}</label>
-                        <label onClick={uploadImage} className="btn btn-info capitalize ml-2">cek image</label>
                     </div>
                 </div>
             </div>

@@ -8,6 +8,8 @@ const config = {
     }
 };
 
+export const ApiBazar = 'http://localhost:8000/api/cms'
+
 export const GetBazar = () => {
     return axios.get(apiUrl,)
     .then(response => response.data)
@@ -25,7 +27,7 @@ export const CreateBazar = (data) => {
 }
 
 export const UpdateBazar = (id, data) => {
-    return axios.put(`${apiUrl}/update/${id}`, data, config)
+    return axios.put(`${apiUrl}/update/${id}`, data)
     .then(response => response.data)
     .catch(error => {
         throw error;
