@@ -97,7 +97,6 @@ const MenuBazar = () => {
     }
 
 
-
     const upsertBazar = async () => {
         try {
             closeUpsert()
