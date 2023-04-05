@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert'
 import { BaseModal, ModalLoading, openModal, closeModal } from '../components/BaseModal'
+import { InputText, InputNumber, InputFile, InputTextArea } from '../components/BaseInput'
 
 const MenuBazar = () => {
     const [bazarList, setBazarList] = useState([])
@@ -54,8 +55,6 @@ const MenuBazar = () => {
         const imageSelect = e.target.files[0]
         setImage(imageSelect);
         setImageUrl(URL.createObjectURL(imageSelect));
-        console.log('image select:', imageSelect)
-        console.log('image:',image)
     };
     
 
@@ -95,7 +94,6 @@ const MenuBazar = () => {
                     gambar: image,
                     description: desc
                 })
-                console.log('result data: ',result);
             } else {
                 // update
                 // setImage(null)
@@ -105,7 +103,6 @@ const MenuBazar = () => {
                     // gambar: image,
                     description: desc
                 })
-                console.log('result data: ',result);
             }
 
             closeModal('modal-loading')
@@ -115,7 +112,6 @@ const MenuBazar = () => {
         } catch (error) {
             closeModal('modal-loading')
             AlertError('Ups! something wrong')
-            console.log(error)
         }
         closeUpsert()
     };
@@ -263,26 +259,15 @@ const MenuBazar = () => {
             </main>
 
             {/* ===== upsert modal ===== */}
-            <BaseModal id='upsert'>
-                <h3 className="font-bold text-2xl capitalize mb-4">{actionText} bazar menu</h3>
+            <BaseModal id='upsert' title={actionText + ' bazar menu'}>
                 <div className='grid gap-4 md:grid-cols-2'>
+                    <InputText name='name' value={name} onChange={handleChange} />
+                    <InputNumber name='price' value={price} onChange={handleChange} />
                     <div>
-                        <p>name</p>
-                        <input type="text" value={name} onChange={handleChange} name='name' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
-                    </div>
-                    <div>
-                        <p>price</p>
-                        <input type="number" value={price} onChange={handleChange} name='price' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
-                    </div>
-                    <div>
-                        <p>image</p>
-                        <input type="file" onChange={handleChangeImage} name='image' id='imageForm' accept='image/*' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                        <InputFile name='image' onChange={handleChangeImage} id='imageForm' accept='image/*' />
                         {imageUrl && <img src={imageUrl} alt="preview" className='h-40 rounded-md mt-4' />}
                     </div>
-                    <div>
-                        <p>description</p>
-                        <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full min-h-full max-w-xs bg-gray-50'></textarea>
-                    </div>
+                    <InputTextArea title='decription' name='desc' value={desc} onChange={handleChange} />
                 </div>
                 {/* <button onClick={cek} className='btn btn-sm'>cek</button> */}
                 <div className="modal-action pt-4">
@@ -292,10 +277,7 @@ const MenuBazar = () => {
             </BaseModal>
 
             {/* ===== loading ===== */}
-            <ModalLoading id='modal-loading'>
-                <h1 className='text-3xl capitalize font-semibold w-full text-center mb-2'>please wait</h1>
-                <p className='w-full text-center mb-8 capitalize'>{actionText} bazar</p>
-            </ModalLoading>
+            <ModalLoading id='modal-loading' title={actionText+' bazar'} />
 
         </Adminpanel>
     )

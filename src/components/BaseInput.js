@@ -16,14 +16,42 @@ export const SearchInput = () => {
     )
 }
 
-export const InputText = () => {
+export const InputText = (props) => {
     return (
-        <div>BaseInput</div>
+        <div>
+            <p>{props.name}</p>
+            <input type="text" value={props.value} onChange={props.onChange} name={props.name} placeholder="Type here"
+                className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+        </div>
     )
 }
 
-export const InputNumber = () => {
+export const InputNumber = (props) => {
     return (
-        <div>BaseInput</div>
+        <div>
+            <p>{props.name}</p>
+            <input type="number" value={props.value} onChange={props.onChange} name={props.name} placeholder="Type here"
+                className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+        </div>
+    )
+}
+
+export const InputFile = (props) => {
+    return (
+        <div>
+            <p>{props.name}</p>
+            <input type="file" onChange={props.onChange} name={props.name} id={props.id} accept={props.accpet} placeholder="Type here"
+                className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+        </div>
+    )
+}
+
+export const InputTextArea = (props) => {
+    return (
+        <div>
+            <p>{props.title}</p>
+            <textarea value={props.value} onChange={props.onChange} name={props.name} placeholder="Type here"
+                className='textarea textarea-info focus:outline-none min-w-full min-h-full max-w-xs bg-gray-50'></textarea>
+        </div>
     )
 }
