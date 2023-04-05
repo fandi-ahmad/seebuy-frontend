@@ -1,7 +1,7 @@
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react'
-import SearchInput from './inputs/SearchInput'
+import { SearchInput } from './BaseInput'
 
 export const Navbar = () => {
     return (

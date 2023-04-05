@@ -5,6 +5,7 @@ import { GetBazar, CreateBazar, UpdateBazar, DeleteBazar, ApiBazar } from '../ap
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert'
+import { BaseModal, ModalLoading, openModal, closeModal } from '../components/BaseModal'
 
 const MenuBazar = () => {
     const [bazarList, setBazarList] = useState([])
@@ -19,12 +20,6 @@ const MenuBazar = () => {
 
     const [editOpen, setEditOpen] = useState(false)
 
-    const [post, setPost] = useState({
-        name: '',
-        price: NaN,
-        image: null,
-        desc: ''
-    })
 
     // get all data bazar from API
     const getAllData = async () => {
@@ -36,21 +31,9 @@ const MenuBazar = () => {
         }
     };
 
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     const setters = {
-    //         name: setName,
-    //         price: setPrice,
-    //         image: setImage,
-    //         desc: setDesc,
-    //     };
-    //     const setter = setters[name];
-    //     setter(value);
-    //     setPost({...post, [e.target.name]: e.target.value})
-    // };
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
+    const handleChange = (e) => {
+        const { name, value } = e.target;
     
         switch (name) {
             case 'name':
@@ -92,6 +75,7 @@ const MenuBazar = () => {
         setPrice('')
         setImage('')
         setImageUrl('')
+        document.getElementById('imageForm').value = ''
         setDesc('')
         setEditOpen(false)
     }
@@ -100,7 +84,7 @@ const MenuBazar = () => {
     const upsertBazar = async () => {
         try {
             closeUpsert()
-            openLoading()
+            openModal('modal-loading')
             const parsePrice = parseInt(price)
 
             // create
@@ -124,12 +108,12 @@ const MenuBazar = () => {
                 console.log('result data: ',result);
             }
 
-            closeLoading()
+            closeModal('modal-loading')
             getAllData()
             AlertSuccess(`Bazar has been ${actionText}`)
             resetData()
         } catch (error) {
-            closeLoading()
+            closeModal('modal-loading')
             AlertError('Ups! something wrong')
             console.log(error)
         }
@@ -140,7 +124,7 @@ const MenuBazar = () => {
     const createNew = () => {
         resetData()
         setActionText('created')
-        openUpsert()
+        openModal('upsert')
     }
 
     const editBazar = (bazar) => {
@@ -150,48 +134,20 @@ const MenuBazar = () => {
         setImage(bazar.gambar)
         setDesc(bazar.description)
         setActionText('updated')
-        
         setEditOpen(true)
-
-        openUpsert()
+        openModal('upsert')
     }
 
     useEffect(() => {
-        console.log(editOpen)
-        if (editOpen) {
-            if (id === '') {
-                console.log('id masih kosong')
-            } else {
-                console.log('id tidak kosong')
-                const takeImage = `http://localhost:8000/api/cms/gambar/${image}`
-
-                setImageUrl(takeImage)
-            }
+        if (editOpen && id !== '') {
+            const takeImage = `${ApiBazar}/gambar/${image}`
+            setImageUrl(takeImage)
         }
     }, [editOpen])
 
-    // open loading modal
-    const openLoading = () => {
-        const modalToggle = document.querySelector('#modal-loading')
-        modalToggle.checked = true
-    }
-    
-    // close loading modal
-    const closeLoading = () => {
-        const modalToggle = document.querySelector('#modal-loading')
-        modalToggle.checked = false
-    }
-
-     // open create/update modal
-     const openUpsert = () => {
-        const modalToggle = document.querySelector('#upsert')
-        modalToggle.checked = true
-    }
-    
     // close create/update modal
     const closeUpsert = () => {
-        const modalToggle = document.querySelector('#upsert')
-        modalToggle.checked = false
+        closeModal('upsert')
         resetData()
     }
 
@@ -210,14 +166,14 @@ const MenuBazar = () => {
     const confirmDeleteBazar = async (id) => {
         try {
             setActionText('Deleted')
-            openLoading()
+            openModal('modal-loading')
             await DeleteBazar(id)
 
-            closeLoading()
+            closeModal('modal-loading')
             getAllData()
             AlertSuccess('Bazar has been deleted')
         } catch (error) {
-            closeLoading()
+            closeModal('modal-loading')
             AlertError('Ups! something wrong')
         }
     }
@@ -226,9 +182,9 @@ const MenuBazar = () => {
         return `Rp. ${harga.toLocaleString("id-ID")}`;
     }
 
-    const limitDesc = (params) => {
-        if (params.length > 30) {
-            return params.slice(0, 30) + " ...";
+    const limitChar = (params, value) => {
+        if (params.length > value) {
+            return params.slice(0, value) + " ...";
         } else {
             return params;
         }
@@ -276,13 +232,13 @@ const MenuBazar = () => {
                                     <tr key={bazar.id} className='text-gray-700'>
                                         <td className='pl-4 py-3'>{index + 1}</td>
                                         <td className="px-4 py-3">
-                                            <p className="font-semibold">{bazar.nama_menu}</p>
+                                            <p className="font-semibold">{limitChar(bazar.nama_menu, 20)}</p>
                                         </td>
                                         <td className="px-4 py-3 text-sm">{formatPrice(bazar.harga)}</td>
                                         <td className="px-4 py-3 text-sm">
-                                            <img alt={bazar.gambar} src={`${ApiBazar}/gambar/${bazar.gambar}`} className='h-20' />
+                                            <img alt={bazar.gambar} src={`${ApiBazar}/gambar/${bazar.gambar}`} className='h-20 rounded-md' />
                                         </td>
-                                        <td className="px-4 py-3 text-sm">{limitDesc(bazar.description)}</td>
+                                        <td className="px-4 py-3 text-sm">{limitChar(bazar.description, 40)}</td>
                                         <td className="px-4 py-3">
                                             <button onClick={() => editBazar(bazar)} htmlFor="upsert" className='btn btn-sm p-0 text-2xl border-0 bg-transparent hover:bg-transparent text-blue-700 hover:text-blue-800 focus:outline-none mr-4'>
                                                 <FontAwesomeIcon icon={faPenToSquare} />
@@ -307,50 +263,40 @@ const MenuBazar = () => {
             </main>
 
             {/* ===== upsert modal ===== */}
-            <input type="checkbox" id="upsert" className="modal-toggle" />
-            <div className="modal">
-                <div className="modal-box w-11/12 max-w-5xl bg-white text-gray-700">
-                    <h3 className="font-bold text-2xl capitalize mb-4">{actionText} bazar menu</h3>
-                    <div className='grid gap-4 md:grid-cols-2'>
-                        <div>
-                            <p>name</p>
-                            <input type="text" value={name} onChange={handleChange} name='name' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
-                        </div>
-                        <div>
-                            <p>price</p>
-                            <input type="number" value={price} onChange={handleChange} name='price' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
-                        </div>
-                        <div>
-                            <p>image</p>
-                            <input type="file" onChange={handleChangeImage} name='image' id='imageForm' accept='image/*' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
-                            {imageUrl && <img src={imageUrl} alt="preview" className='h-40 rounded-md mt-4' />}
-                        </div>
-                        <div>
-                            <p>description</p>
-                            <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full min-h-full max-w-xs bg-gray-50'></textarea>
-                        </div>
+            <BaseModal id='upsert'>
+                <h3 className="font-bold text-2xl capitalize mb-4">{actionText} bazar menu</h3>
+                <div className='grid gap-4 md:grid-cols-2'>
+                    <div>
+                        <p>name</p>
+                        <input type="text" value={name} onChange={handleChange} name='name' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
                     </div>
-                    {/* <button onClick={cek} className='btn btn-sm'>cek</button> */}
-                    <div className="modal-action pt-4">
-                        <label onClick={closeUpsert} className="btn btn-error capitalize mr-2">close</label>
-                        <label onClick={upsertBazar} className="btn btn-info capitalize">{actionText}</label>
+                    <div>
+                        <p>price</p>
+                        <input type="number" value={price} onChange={handleChange} name='price' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                    </div>
+                    <div>
+                        <p>image</p>
+                        <input type="file" onChange={handleChangeImage} name='image' id='imageForm' accept='image/*' placeholder="Type here" className="input input-info focus:outline-none min-w-full max-w-xs bg-gray-50" />
+                        {imageUrl && <img src={imageUrl} alt="preview" className='h-40 rounded-md mt-4' />}
+                    </div>
+                    <div>
+                        <p>description</p>
+                        <textarea value={desc} onChange={handleChange} name='desc' placeholder="Type here" className='textarea textarea-info focus:outline-none min-w-full min-h-full max-w-xs bg-gray-50'></textarea>
                     </div>
                 </div>
-            </div>
+                {/* <button onClick={cek} className='btn btn-sm'>cek</button> */}
+                <div className="modal-action pt-4">
+                    <label onClick={closeUpsert} className="btn btn-error capitalize mr-2">close</label>
+                    <label onClick={upsertBazar} className="btn btn-info capitalize">{actionText}</label>
+                </div>
+            </BaseModal>
 
             {/* ===== loading ===== */}
-            <input type="checkbox" id="modal-loading" className="modal-toggle" />
-            <label htmlFor="modal-loading" className="modal">
-                <label className="modal-box relative bg-white text-gray-700 flex justify-center">
-                    <div className='text-center'>
-                        <h1 className='text-3xl capitalize font-semibold w-full text-center mb-2'>please wait</h1>
-                        <p className='w-full text-center mb-8 capitalize'>{actionText} bazar</p>
-                        <div className='w-full flex justify-center'>
-                            <div className='loader'></div>
-                        </div>
-                    </div>
-                </label>
-            </label>
+            <ModalLoading id='modal-loading'>
+                <h1 className='text-3xl capitalize font-semibold w-full text-center mb-2'>please wait</h1>
+                <p className='w-full text-center mb-8 capitalize'>{actionText} bazar</p>
+            </ModalLoading>
+
         </Adminpanel>
     )
 }

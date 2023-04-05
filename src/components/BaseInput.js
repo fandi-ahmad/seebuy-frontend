@@ -2,7 +2,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 
-const SearchInput = () => {
+export const SearchInput = () => {
     return (
         <div className="flex justify-center flex-1 lg:mr-32">
             <div className="relative w-full max-w-xl mr-6 focus-within:text-purple-500" >
@@ -16,4 +16,14 @@ const SearchInput = () => {
     )
 }
 
-export default SearchInput
+export const InputText = () => {
+    return (
+        <div>BaseInput</div>
+    )
+}
+
+export const InputNumber = () => {
+    return (
+        <div>BaseInput</div>
+    )
+}
