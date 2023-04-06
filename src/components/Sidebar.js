@@ -1,8 +1,27 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faHouse, faUser, faBurger, faList } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
+import { useEffect } from "react";
 
 export const Sidebar = () => {
+    const location = useLocation()
+
+    const setActive = (id) => {
+        document.getElementById(id).classList.remove('hidden')
+    }
+
+    useEffect(() => {
+        if (location.pathname === '/') {
+            setActive('dashboard')
+        } else if (location.pathname === '/data-admin') {
+            setActive('data-admin')
+        } else if (location.pathname === '/menu-bazar') {
+            setActive('menu-bazar')
+        } else if (location.pathname === '/data-pesanan') {
+            setActive('data-pesanan')
+        }
+    }, [location]);
+
     return (
         <>
             <aside className="z-20 hidden w-64 overflow-y-auto bg-white md:block flex-shrink-0" >
@@ -12,33 +31,36 @@ export const Sidebar = () => {
                     </a>
                     <ul className="mt-6">
                         <li className="relative px-6 py-3">
-                            <span className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true" ></span>
-                            <Link to={'/'} className="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800">
+                            <span id="dashboard" className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg hidden" aria-hidden="true" ></span>
+                            <NavLink to={'/'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faHouse} />
                                 <span className="ml-4">Dashboard</span>
-                            </Link>
+                            </NavLink>
                         </li>
                     </ul>
                     <ul>
                         <li className="relative px-6 py-3">
-                            <Link to={'/data-admin'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
+                            <span id="data-admin" className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg hidden" aria-hidden="true" ></span>
+                            <NavLink to={'/data-admin'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faUser} />
                                 <span className="ml-4">Data Admin</span>
-                            </Link>
+                            </NavLink>
                         </li>
 
                         <li className="relative px-6 py-3">
-                            <Link to={'/menu-bazar'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
+                            <span id="menu-bazar" className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg hidden" aria-hidden="true" ></span>
+                            <NavLink to={'/menu-bazar'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faBurger} />
                                 <span className="ml-4">Menu Bazar</span>
-                            </Link>
+                            </NavLink>
                         </li>
 
                         <li className="relative px-6 py-3">
-                            <Link to={'/data-pesanan'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
+                            <span id="data-pesanan" className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg hidden" aria-hidden="true" ></span>
+                            <NavLink to={'/data-pesanan'} className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800">
                                 <FontAwesomeIcon icon={faList} />
                                 <span className="ml-4">Data Pesanan</span>
-                            </Link>
+                            </NavLink>
                         </li>
                         
                     </ul>
