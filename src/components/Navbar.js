@@ -1,9 +1,22 @@
-import { faBell } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react'
 import { SearchInput } from './BaseInput'
+import { useNavigate } from 'react-router-dom'
+import { AlertConfirm } from './SweetAlert'
 
 export const Navbar = () => {
+    const navigate = useNavigate()
+    const logOut = () => {
+        AlertConfirm({
+            title: 'Log Out',
+            text: 'Do you want to log out?',
+            preConfirm: () => {
+                navigate('/login')
+            }
+        })
+    }
+
     return (
         <header className="z-10 py-4 bg-white shadow-md ">
             <div className="container flex items-center justify-between h-full px-6 mx-auto text-purple-600">
@@ -29,8 +42,12 @@ export const Navbar = () => {
                             alt="" tabIndex={1}
                         />
                         <ul tabIndex={1} className="dropdown-content menu p-2 shadow bg-white border-gray-100 text-gray-600 rounded-lg w-52">
-                            <li className='font-semibold'><a>Item 2.1</a></li>
-                            <li className='font-semibold'><a>Item 2.2</a></li>
+                            <li className='font-semibold'>
+                                <a onClick={logOut}>
+                                    <FontAwesomeIcon icon={faRightFromBracket} />
+                                    Log out
+                                </a>
+                            </li>
                         </ul>
                     </li>
 

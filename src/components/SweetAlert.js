@@ -20,9 +20,9 @@ export const AlertConfirm = (props) => {
     Swal.fire({
         icon: 'question',
         title: props.title,
-        text: "You won't be able to revert this!",
+        text: props.text || "You won't be able to revert this!",
         showCancelButton: true,
-        confirmButtonText: props.confirmText,
+        confirmButtonText: props.confirmText || 'Yes',
         preConfirm: props.preConfirm
     })
 }

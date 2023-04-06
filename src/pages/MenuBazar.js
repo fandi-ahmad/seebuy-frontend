@@ -7,6 +7,7 @@ import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icon
 import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert'
 import { BaseModal, ModalLoading, openModal, closeModal } from '../components/BaseModal'
 import { InputText, InputNumber, InputFile, InputTextArea } from '../components/BaseInput'
+import { ButtonSm } from '../components/BaseButton'
 
 const MenuBazar = () => {
     const [bazarList, setBazarList] = useState([])
@@ -202,10 +203,10 @@ const MenuBazar = () => {
         <Adminpanel>
             <div className='mb-4 flex justify-between items-center'>
                 <h2 className="text-2xl font-semibold text-gray-700">Menu Bazar</h2>
-                <label onClick={createNew} className='btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none focus:outline-none capitalize'>
+                <ButtonSm onClick={createNew} >
                     <span className='mr-2'>create</span>
                     <FontAwesomeIcon icon={faPlus} />
-                </label>
+                </ButtonSm>
             </div>
 
             {/* <!-- New Table --> */}
