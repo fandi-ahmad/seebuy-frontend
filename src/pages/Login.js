@@ -1,9 +1,61 @@
-import React from 'react'
+import { React, useState }from 'react'
 import { AuthLayout } from '../layouts/AuthLayout'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { LoginUser } from '../api/Auth'
+import { AlertSuccess, AlertError } from '../components/SweetAlert'
+import { ModalLoading, openModal, closeModal } from '../components/BaseModal'
+import { ButtonMd } from '../components/BaseButton'
 
 const Login = () => {
     const loginOffice = require('../assets/img/login-office.jpeg')
+    const navigate = useNavigate()
+
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+    
+        switch (name) {
+            case 'email':
+                setEmail(value);
+                break;
+            case 'password':
+                setPassword(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    const resetData = () => {
+        setEmail('')
+        setPassword('')
+    }
+
+    const loginAccount = async () => {
+        try {
+            openModal('modal-loading')
+            if (email === '' || password === '') {
+                AlertError('Input cannot be empty')
+            } else {
+                const response = await LoginUser({
+                    email: email,
+                    password: password
+                })
+                resetData()
+                if (response.code === 401) {
+                    AlertError('Email or password is wrong')
+                } else {
+                    AlertSuccess('Loggin in successfully')
+                    navigate('/')
+                }
+            }
+            closeModal('modal-loading')
+        } catch (error) {
+            AlertError('Ups, something wrong!')
+        }
+    }
 
     return (
         <AuthLayout>
@@ -17,24 +69,21 @@ const Login = () => {
                 </h1>
                 <label className="block text-sm">
                     <span className="text-gray-700">Email</span>
-                    <input type='email' placeholder="Your email" className="block w-full mt-1 text-sm text-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input" />
+                    <input name='email' value={email} onChange={handleChange} type='email' placeholder="Your email" autoComplete='off' className="block w-full mt-1 text-sm text-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input" />
                 </label>
                 <label className="block mt-4 text-sm">
                     <span className="text-gray-700">Password</span>
-                    <input type="password" placeholder="***************" className="block w-full mt-1 text-sm text-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input" />
+                    <input name='password' value={password} onChange={handleChange} type="password" placeholder="***************" autoComplete='off' className="block w-full mt-1 text-sm text-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input" />
                 </label>
 
-                {/* <!-- You should use a button here, as the anchor is only used for the example  --> */}
-                <a href="../index.html" className="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple" >
-                    Log in
-                </a>
+                <ButtonMd onClick={loginAccount}>Log in</ButtonMd>
 
                 <hr className="my-8" />
 
                 <p className="mt-4">
-                    <a href="./forgot-password.html" className="text-sm font-medium text-purple-600 hover:underline" >
+                    <Link to={'/forgot-password'} className="text-sm font-medium text-purple-600 hover:underline" >
                         Forgot your password?
-                    </a>
+                    </Link>
                 </p>
                 <p className="mt-1">
                     <Link to={'/register'} className="text-sm font-medium text-purple-600 hover:underline" >
@@ -43,6 +92,7 @@ const Login = () => {
                 </p>
                 </div>
             </div>
+            <ModalLoading id='modal-loading'/>
         </AuthLayout>
     )
 }

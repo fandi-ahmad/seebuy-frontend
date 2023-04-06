@@ -5,6 +5,7 @@ import { RegisterUser } from '../api/Auth'
 import { useState, useEffect } from 'react'
 import { AlertSuccess, AlertError } from '../components/SweetAlert'
 import { ModalLoading, openModal, closeModal } from '../components/BaseModal'
+import { ButtonMd } from '../components/BaseButton'
 
 const Register = () => {
     const createAccountImg = require('../assets/img/create-account-office.jpeg')
@@ -48,20 +49,26 @@ const Register = () => {
     const createAccount = async () => {
         try {
             openModal('modal-loading')
-            const result = await RegisterUser({
-                name: name,
-                email: email,
-                password: password
-            })
-
+            if (name === '' || email === '' || password === '') {
+                AlertError('Input cannot be empty')
+            } else if (password.length <= 8) {
+                AlertError('Password must be at least 8 characters')
+            } else {
+                const response = await RegisterUser({
+                    name: name,
+                    email: email,
+                    password: password
+                })
+                resetData()
+                if (response.message === 'check your validation') {
+                    AlertError('Your email already registered')
+                } else {
+                    AlertSuccess('Check your email for verification')
+                }
+            }
             closeModal('modal-loading')
-            AlertSuccess('Check your email for verification')
-            resetData()
-            setTimeout(() => {
-                navigate('/login')
-            }, 5000);
         } catch (error) {
-            console.log(error)
+            AlertError('Ups, something wrong!')
         }
     }
 
@@ -87,14 +94,7 @@ const Register = () => {
                     <input name='password' value={password} onChange={handleChange} autoComplete='off' type="password" placeholder="***************" className="block w-full mt-1 text-sm text-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input" />
                 </label>
 
-
-                {/* <button onClick={cek} className="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                    cek nilai
-                </button> */}
-
-                <button onClick={createAccount} className="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                    Create account
-                </button>
+                <ButtonMd onClick={createAccount}>createAccount</ButtonMd>
 
                 <hr className="my-8" />
 
