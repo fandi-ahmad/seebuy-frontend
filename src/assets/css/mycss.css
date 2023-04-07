@@ -8,7 +8,7 @@
     border-bottom-color: transparent;
     border-radius: 50%;
     animation: spin_51 1.5s infinite linear;
-  }
+}
   
 @keyframes spin_51 {
     from {
@@ -18,4 +18,9 @@
     to {
         transform: rotate(360deg)
     }
+}
+
+/* link active sidebar (bg-gray-800) */
+.active {
+    color: rgb(31, 41, 55);
 }
