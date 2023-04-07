@@ -3,10 +3,10 @@ import { Pagination } from '../components/Pagination'
 import { Adminpanel } from '../layouts/Adminpanel'
 import { GetBazar, CreateBazar, UpdateBazar, DeleteBazar, ApiBazar } from '../api/MenuBazar'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faFaceFrownOpen, faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert'
 import { BaseModal, ModalLoading, openModal, closeModal } from '../components/BaseModal'
-import { InputText, InputNumber, InputFile, InputTextArea, BaseInput, InputIcon } from '../components/BaseInput'
+import { InputFile, InputTextArea, BaseInput, InputIcon } from '../components/BaseInput'
 import { ButtonSm } from '../components/BaseButton'
 
 const MenuBazar = () => {
@@ -22,16 +22,30 @@ const MenuBazar = () => {
 
     const [editOpen, setEditOpen] = useState(false)
 
+    const getId = (id) => {
+        return document.getElementById(id)
+    }
 
     // get all data bazar from API
     const getAllData = async () => {
         try {
+            getId('dataEmpty').classList.add('hidden')
+            getId('tableLoad').classList.remove('hidden')
             const result = await GetBazar();
             setBazarList(result.data);
+            getId('tableLoad').classList.add('hidden')
         } catch (err) {
             AlertError('Ups! something wrong')
         }
     };
+    
+    useEffect(() => {
+        if (bazarList.length === 0) {
+            getId('dataEmpty').classList.remove('hidden')
+        } else {
+            getId('dataEmpty').classList.add('hidden')
+        }
+    }, [bazarList])
 
     const formatNumber = (number) => {
         return Number(number).toLocaleString();
@@ -79,7 +93,7 @@ const MenuBazar = () => {
         setPrice('')
         setImage('')
         setImageUrl('')
-        document.getElementById('imageForm').value = ''
+        getId('imageForm').value = ''
         setDesc('')
         setEditOpen(false)
     }
@@ -223,6 +237,19 @@ const MenuBazar = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y" >
+                            <tr id='tableLoad' className='hidden'>
+                                <td colSpan={10}>
+                                    <div className='w-full flex justify-center my-5'>
+                                        <div className='loader'></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr id='dataEmpty' className='hidden'>
+                                <td colSpan={10} className='text-5xl w-full text-center py-5'>
+                                    <FontAwesomeIcon icon={faFaceFrownOpen} />
+                                    <div className='text-lg pt-2'>Data is not available</div>
+                                </td>
+                            </tr>
                             {bazarList.map((bazar, index) => {
                                 return (
                                     <tr key={bazar.id} className='text-gray-700'>
