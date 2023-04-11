@@ -3,10 +3,10 @@ import { Pagination } from '../components/Pagination'
 import { Adminpanel } from '../layouts/Adminpanel'
 import { GetBazar, CreateBazar, UpdateBazar, DeleteBazar, ApiBazar } from '../api/MenuBazar'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faFaceFrownOpen, faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { AlertSuccess, AlertConfirm, AlertError } from '../components/SweetAlert'
 import { BaseModal, ModalLoading, openModal, closeModal } from '../components/BaseModal'
-import { InputText, InputNumber, InputFile, InputTextArea } from '../components/BaseInput'
+import { InputFile, InputTextArea, BaseInput, InputIcon } from '../components/BaseInput'
 import { ButtonSm } from '../components/BaseButton'
 
 const MenuBazar = () => {
@@ -22,17 +22,34 @@ const MenuBazar = () => {
 
     const [editOpen, setEditOpen] = useState(false)
 
+    const getId = (id) => {
+        return document.getElementById(id)
+    }
 
     // get all data bazar from API
     const getAllData = async () => {
         try {
+            getId('dataEmpty').classList.add('hidden')
+            getId('tableLoad').classList.remove('hidden')
             const result = await GetBazar();
             setBazarList(result.data);
+            getId('tableLoad').classList.add('hidden')
         } catch (err) {
             AlertError('Ups! something wrong')
         }
     };
+    
+    useEffect(() => {
+        if (bazarList.length === 0) {
+            getId('dataEmpty').classList.remove('hidden')
+        } else {
+            getId('dataEmpty').classList.add('hidden')
+        }
+    }, [bazarList])
 
+    const formatNumber = (number) => {
+        return Number(number).toLocaleString();
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -42,7 +59,8 @@ const MenuBazar = () => {
                 setName(value);
                 break;
             case 'price':
-                setPrice(value);
+                const newValue = value.replace(/[^0-9]/g, '');
+                setPrice(formatNumber(newValue));
                 break;
             case 'desc':
                 setDesc(value);
@@ -75,7 +93,7 @@ const MenuBazar = () => {
         setPrice('')
         setImage('')
         setImageUrl('')
-        document.getElementById('imageForm').value = ''
+        getId('imageForm').value = ''
         setDesc('')
         setEditOpen(false)
     }
@@ -83,38 +101,41 @@ const MenuBazar = () => {
 
     const upsertBazar = async () => {
         try {
-            closeUpsert()
-            openModal('modal-loading')
-            const parsePrice = parseInt(price)
-
-            // create
-            if (id === '') {
-                const result = await CreateBazar({
-                    nama_menu: name,
-                    harga: parsePrice,
-                    gambar: image,
-                    description: desc
-                })
+            if (name === '' || price === '' || image === '' || desc === '') {
+                AlertError('Input cannot be empty')
             } else {
-                // update
-                // setImage(null)
-                const result = await UpdateBazar(id, {
-                    nama_menu: name,
-                    harga: parsePrice,
-                    // gambar: image,
-                    description: desc
-                })
+                closeUpsert()
+                openModal('modal-loading')
+                const parsePrice = parseInt(price.replaceAll(',', '')); 
+                
+                // create
+                if (id === '') {
+                    const result = await CreateBazar({
+                        nama_menu: name,
+                        harga: parsePrice,
+                        gambar: image,
+                        description: desc
+                    })
+                } else {
+                    // update
+                    // setImage(null)
+                    const result = await UpdateBazar(id, {
+                        nama_menu: name,
+                        harga: parsePrice,
+                        // gambar: image,
+                        description: desc
+                    })
+                }
+    
+                closeModal('modal-loading')
+                getAllData()
+                AlertSuccess(`Bazar has been ${actionText}`)
+                resetData()
             }
-
-            closeModal('modal-loading')
-            getAllData()
-            AlertSuccess(`Bazar has been ${actionText}`)
-            resetData()
         } catch (error) {
             closeModal('modal-loading')
             AlertError('Ups! something wrong')
         }
-        closeUpsert()
     };
 
 
@@ -127,7 +148,7 @@ const MenuBazar = () => {
     const editBazar = (bazar) => {
         setId(bazar.id)
         setName(bazar.nama_menu)
-        setPrice(bazar.harga)
+        setPrice(formatNumber(bazar.harga));
         setImage(bazar.gambar)
         setDesc(bazar.description)
         setActionText('updated')
@@ -175,10 +196,6 @@ const MenuBazar = () => {
         }
     }
 
-    function formatPrice(harga) {
-        return `Rp. ${harga.toLocaleString("id-ID")}`;
-    }
-
     const limitChar = (params, value) => {
         if (params.length > value) {
             return params.slice(0, value) + " ...";
@@ -192,12 +209,8 @@ const MenuBazar = () => {
         const fetchData = async () => {
             await getAllData();
         };
-        if (bazarList.length === 0) {
-            setTimeout(() => {
-                fetchData();
-            }, 100);
-        }
-    });
+        fetchData()
+    }, []);
 
     return (
         <Adminpanel>
@@ -224,6 +237,19 @@ const MenuBazar = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y" >
+                            <tr id='tableLoad' className='hidden'>
+                                <td colSpan={10}>
+                                    <div className='w-full flex justify-center my-5'>
+                                        <div className='loader'></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr id='dataEmpty' className='hidden'>
+                                <td colSpan={10} className='text-5xl w-full text-center py-5'>
+                                    <FontAwesomeIcon icon={faFaceFrownOpen} />
+                                    <div className='text-lg pt-2'>Data is not available</div>
+                                </td>
+                            </tr>
                             {bazarList.map((bazar, index) => {
                                 return (
                                     <tr key={bazar.id} className='text-gray-700'>
@@ -231,7 +257,7 @@ const MenuBazar = () => {
                                         <td className="px-4 py-3">
                                             <p className="font-semibold">{limitChar(bazar.nama_menu, 20)}</p>
                                         </td>
-                                        <td className="px-4 py-3 text-sm">{formatPrice(bazar.harga)}</td>
+                                        <td className="px-4 py-3 text-sm">Rp. {formatNumber(bazar.harga)}</td>
                                         <td className="px-4 py-3 text-sm">
                                             <img alt={bazar.gambar} src={`${ApiBazar}/gambar/${bazar.gambar}`} className='h-20 rounded-md' />
                                         </td>
@@ -262,8 +288,8 @@ const MenuBazar = () => {
             {/* ===== upsert modal ===== */}
             <BaseModal id='upsert' title={actionText + ' bazar menu'}>
                 <div className='grid gap-4 md:grid-cols-2'>
-                    <InputText name='name' value={name} onChange={handleChange} />
-                    <InputNumber name='price' value={price} onChange={handleChange} />
+                    <BaseInput name='name' value={name} onChange={handleChange} />
+                    <InputIcon icon='Rp.' name='price' value={price} onChange={handleChange} />
                     <div>
                         <InputFile name='image' onChange={handleChangeImage} id='imageForm' accept='image/*' />
                         {imageUrl && <img src={imageUrl} alt="preview" className='h-40 rounded-md mt-4' />}
