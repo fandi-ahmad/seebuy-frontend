@@ -4,6 +4,23 @@ import { Pagination } from '../components/Pagination'
 import { Adminpanel } from '../layouts/Adminpanel'
 
 export const Dashhboard = () => {
+
+    const [batteryLevel, setBatterLevel] = useState('')
+
+    const batteryInfo = () => {
+        navigator.getBattery().then(function(battery) {
+            setBatterLevel(battery.level * 100)
+            // console.log("Level baterai: " + battery.level * 100 + "%");
+            // console.log("Status pengisian baterai: " + battery.charging);
+            // console.log("Waktu pengisian baterai: " + battery.chargingTime + " detik");
+            // console.log("Waktu pengosongan baterai: " + battery.dischargingTime + " detik");
+        });
+    }
+
+    useEffect(() => {
+        batteryInfo()
+    }, [])
+      
     return (
         <Adminpanel>
             <h2 className="mb-6 text-2xl font-semibold text-gray-700">Dashboard</h2>
@@ -15,6 +32,12 @@ export const Dashhboard = () => {
                 <Card color='green' title='Accounts balance' value='$ 46,760.89' />
                 <Card color='blue' title='New sales' value='376' />
                 <Card color='teal' title='Pending contact' value='28' />
+            </div>
+
+            <div className="battery">
+                <div className="battery-level" style={{width: `${batteryLevel}%`}}></div>
+                <div className="battery-cap"></div>
+                <div className='battery-label'>{batteryLevel}%</div>
             </div>
 
            
